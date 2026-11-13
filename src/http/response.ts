@@ -1,4 +1,4 @@
-export type TResponse = { message: string; error: boolean; code: number; data: unknown };
+import type { TResponse } from './types/response.js';
 
 /**
  * Builds a successful response in the standard envelope
