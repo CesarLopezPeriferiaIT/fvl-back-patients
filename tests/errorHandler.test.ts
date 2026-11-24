@@ -1,3 +1,4 @@
+import boom from '@hapi/boom';
 import type { NextFunction, Request, Response } from 'express';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -14,7 +15,18 @@ describe('errorHandler', () => {
     const res = buildResponse();
     errorHandler(new Error('db password leaked'), {} as Request, res as unknown as Response, vi.fn());
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Internal server error.', error: true, code: 500, data: null });
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Error interno del servidor.', error: true, code: 500, data: { error_code: 'INTERNAL_ERROR' }
+    });
+  });
+
+  it('keeps the message and data of an error thrown on purpose with boom', () => {
+    const res = buildResponse();
+    const error = boom.serverUnavailable('Try again.');
+    error.data = { error_code: 'unavailable' };
+    errorHandler(error, {} as Request, res as unknown as Response, vi.fn());
+    expect(res.status).toHaveBeenCalledWith(503);
+    expect(res.json).toHaveBeenCalledWith({ message: 'Try again.', error: true, code: 503, data: { error_code: 'unavailable' } });
   });
 
   it('delegates to the next handler when the response already started', () => {

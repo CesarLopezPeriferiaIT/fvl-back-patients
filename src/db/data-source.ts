@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 
+import { PacienteEntity } from './entities/Paciente.class.js';
+
 let dataSource: Promise<DataSource> | undefined;
 
 /**
@@ -17,7 +19,7 @@ export const getDataSource = (): Promise<DataSource> => {
     synchronize: false,
     logging: false,
     options: { encrypt: false },
-    entities: []
+    entities: [PacienteEntity]
   })
     .initialize()
     .catch((error: unknown) => {
